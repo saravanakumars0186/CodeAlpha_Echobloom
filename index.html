@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echobloom | Music Player</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+        <div id="home-view">
+            <div class="header">
+                <div class="user-info">
+                    <div style="position: relative;">
+                        <div class="avatar" id="profile-avatar" onclick="toggleProfileMenu()" style="cursor: pointer;">EB</div>
+                        <div id="profile-menu" class="profile-dropdown">
+                            <div class="dropdown-item" onclick="openSettings()">Settings <i class="fas fa-cog"></i></div>
+                            <div class="dropdown-item" onclick="openPrivacy()">Privacy <i class="fas fa-shield-alt"></i></div>
+                            <div class="dropdown-item" onclick="openAccount()">Switch Account <i class="fas fa-user-circle"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p id="greeting-text" style="font-size: 14px; color: #888;">Welcome to</p>
+                        <h2 id="display-user-name" style="font-size: 20px; font-weight: 800; background: linear-gradient(45deg, #ff7e5f, #feb47b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Echobloom</h2>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="history-btn" onclick="toggleHistory()">
+                        <i class="fas fa-history"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="search-wrapper">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search songs, artists..." autocomplete="off">
+                </div>
+                <div id="search-dropdown" class="search-dropdown"></div>
+            </div>
+
+            <h2 class="section-title">Your Playlists</h2>
+            <div class="playlist-grid">
+                <div class="playlist-card fav-card" onclick="openPlaylist('favorites')">
+                    <div class="icon" style="background: linear-gradient(45deg, #ff7e5f, #feb47b);"><i class="fas fa-heart"></i></div>
+                    <h3>Favorites</h3>
+                    <p id="fav-count">0 Songs</p>
+                </div>
+                <div class="playlist-card" onclick="openPlaylist('tamil')">
+                    <div class="icon" style="background: #e63946;"><i class="fas fa-music"></i></div>
+                    <h3>Tamil Hits</h3>
+                    <p>6 Songs</p>
+                </div>
+                <div class="playlist-card" onclick="openPlaylist('english')">
+                    <div class="icon" style="background: #1d3557;"><i class="fas fa-globe"></i></div>
+                    <h3>English Pop</h3>
+                    <p>4 Songs</p>
+                </div>
+                <div class="playlist-card" onclick="openPlaylist('melody')">
+                    <div class="icon" style="background: #9b59b6;"><i class="fas fa-headphones-alt"></i></div>
+                    <h3>Melody Vibes</h3>
+                    <p>5 Songs</p>
+                </div>
+                <div class="playlist-card" onclick="openPlaylist('hindi')">
+                    <div class="icon" style="background: #f39c12;"><i class="fas fa-microphone-alt"></i></div>
+                    <h3>Hindi Songs</h3>
+                    <p>3 Songs</p>
+                </div>
+                <div class="playlist-card" onclick="openPlaylist('album')">
+                    <div class="icon" style="background: #27ae60;"><i class="fas fa-record-vinyl"></i></div>
+                    <h3>Album Songs</h3>
+                    <p>3 Songs</p>
+                </div>
+            </div>
+
+            <div id="custom-playlists-container" class="playlist-grid"></div>
+
+            <h2 class="section-title">Activity</h2>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h4 id="listen-time">0m</h4>
+                    <p>Time Spent</p>
+                </div>
+                <div class="stat-box">
+                    <h4 id="songs-played">0</h4>
+                    <p>Songs Played</p>
+                </div>
+            </div>
+
+            <button class="btn-custom" onclick="createNewPlaylist()">
+                <i class="fas fa-plus"></i> Create Custom Playlist
+            </button>
+        </div>
+
+        <div id="mini-player" onclick="openPlayer()">
+            <div class="mini-info">
+                <div id="mini-art"></div>
+                <div class="mini-text">
+                    <h4 id="mini-title">Song Title</h4>
+                    <p id="mini-artist">Artist Name</p>
+                </div>
+            </div>
+            <div class="mini-controls" onclick="event.stopPropagation()">
+                <i class="fas fa-step-backward" onclick="prevSong()"></i>
+                <div class="mini-play-btn" onclick="togglePlay()">
+                    <i class="fas fa-play" id="mini-play-icon"></i>
+                </div>
+                <i class="fas fa-step-forward" onclick="nextSong()"></i>
+            </div>
+            <div class="mini-progress-container" onclick="event.stopPropagation(); seekAudioMini(event)" id="mini-progress-bar">
+                <div class="mini-progress-fill" id="mini-progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="song-list-view">
+            <div style="display: flex; align-items: center; margin-bottom: 20px; gap: 15px;">
+                <i class="fas fa-arrow-left back-btn" onclick="closePlaylist()"></i>
+                <h2 class="section-title" id="playlist-title" style="margin-bottom: 0;">Playlist</h2>
+            </div>
+            <div id="song-list-container"></div>
+        </div>
+
+        <div id="player-view">
+            <div class="player-content-wrapper">
+                <div class="player-header">
+                    <i class="fas fa-chevron-down" style="font-size: 24px; cursor:pointer;" onclick="closePlayer()"></i>
+                    <span style="font-size: 14px; letter-spacing: 2px;">NOW PLAYING</span>
+                    <div style="position: relative;">
+                        <i class="fas fa-ellipsis-v" id="player-dots-icon" style="font-size: 24px; cursor:pointer;" onclick="togglePlayerMenu()"></i>
+                        
+                        <div id="player-menu" class="player-dropdown">
+                            <div class="dropdown-item" onclick="shareSong()">Share <i class="fas fa-share-alt"></i></div>
+                            <div class="dropdown-item" onclick="downloadSong()">Download <i class="fas fa-download"></i></div>
+                            <div class="dropdown-item" onclick="deleteSong()">Delete Song <i class="fas fa-trash"></i></div>
+                            <div class="dropdown-item" onclick="openAddToPlaylistMenu()">Add to Playlist <i class="fas fa-plus"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="album-art-container">
+                    <div class="album-art" id="album-art"></div>
+                </div>
+
+                <div class="player-controls-section">
+                    <div class="song-info">
+                        <div>
+                            <h2 id="player-title">Song Title</h2>
+                            <p id="player-artist">Artist Name</p>
+                        </div>
+                        <i class="far fa-heart heart-icon" id="like-btn" onclick="toggleLike()"></i>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar" onclick="seekAudio(event)">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="time-info">
+                            <span id="current-time">0:00</span>
+                            <span id="total-time">0:00</span>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <i class="fas fa-step-backward" onclick="prevSong()"></i>
+                        <div class="play-pause-btn" onclick="togglePlay()">
+                            <i class="fas fa-play" id="play-icon"></i>
+                        </div>
+                        <i class="fas fa-step-forward" onclick="nextSong()"></i>
+                    </div>
+
+                    <div class="volume-control">
+                        <i class="fas fa-volume-down"></i>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" onchange="changeVolume()">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-view">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title" style="margin: 0;">History</h2>
+                <i class="fas fa-times" style="font-size: 24px; cursor: pointer;" onclick="toggleHistory()"></i>
+            </div>
+            <div id="history-container">
+                <p style="color: #888; text-align: center; margin-top: 50px;">No songs played yet.</p>
+            </div>
+        </div>
+        
+        <div id="add-to-playlist-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h3>Select a Playlist</h3>
+                <div id="playlist-options"></div>
+                <button class="cancel-btn" onclick="closePlaylistModal()">Cancel</button>
+            </div>
+        </div>
+
+        <div id="settings-view" class="side-panel">
+            <div class="side-header">
+                <i class="fas fa-arrow-left" onclick="closeSettings()"></i>
+                <h2>Settings</h2>
+            </div>
+            <div class="settings-list">
+                <div class="settings-item" onclick="openAccount()">
+                    <i class="far fa-user-circle"></i>
+                    <div class="set-text"><h4>Account</h4><p>Username • Close account</p></div>
+                </div>
+                <div class="settings-item">
+                    <i class="fas fa-paint-brush"></i>
+                    <div class="set-text"><h4>Content and display</h4><p>Canvas • Languages for music</p></div>
+                </div>
+                <div class="settings-item" onclick="openPrivacy()">
+                    <i class="fas fa-lock"></i>
+                    <div class="set-text"><h4>Privacy and social</h4><p>Private session • Public playlists</p></div>
+                </div>
+                <div class="settings-item">
+                    <i class="fas fa-volume-up"></i>
+                    <div class="set-text"><h4>Playback</h4><p>Gapless playback • Autoplay</p></div>
+                </div>
+                <div class="settings-item">
+                    <i class="far fa-bell"></i>
+                    <div class="set-text"><h4>Notifications</h4><p>Push • Email</p></div>
+                </div>
+                <div class="settings-item">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div class="set-text"><h4>Apps and devices</h4><p>Google Maps • Connect control</p></div>
+                </div>
+                <div class="settings-item">
+                    <i class="fas fa-arrow-circle-down"></i>
+                    <div class="set-text"><h4>Data-saving and offline</h4><p>Data Saver mode • Downloads</p></div>
+                </div>
+                <div class="settings-item">
+                    <i class="fas fa-signal"></i>
+                    <div class="set-text"><h4>Media quality</h4><p>Wi-Fi streaming • Audio download</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="privacy-view" class="side-panel">
+            <div class="side-header">
+                <i class="fas fa-arrow-left" onclick="closePrivacy()"></i>
+                <h2>Privacy and social</h2>
+            </div>
+            <div class="settings-list">
+                <h3 class="panel-subhead">Listening activity</h3>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <h4>Private session</h4>
+                        <p>Temporarily hides your listening activity everywhere, and ends after 6 hours.</p>
+                        <a href="#" style="font-size: 12px; color: var(--primary-orange); text-decoration: none;">ⓘ Learn more</a>
+                    </div>
+                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <h4>Listening activity</h4>
+                        <p>Your followers can see what you're listening to in real time.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <h4>Recently played artists</h4>
+                        <p>People can see who you recently listened to on your profile.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <h3 class="panel-subhead" style="margin-top: 30px;">Playlist visibility</h3>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <h4>Public playlists</h4>
+                        <p>New playlists you create will be viewable by others by default and can be added to your profile.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="account-view" class="side-panel">
+            <div class="side-header">
+                <i class="fas fa-arrow-left" onclick="closeAccount()"></i>
+                <h2>Account Settings</h2>
+            </div>
+            <div class="account-form">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" value="user@echobloom.com" disabled style="background: #f5f5f5; color: #888;">
+                    <p style="font-size: 12px; color: #aaa; margin-top: 5px;">Email address cannot be changed.</p>
+                </div>
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" id="user-name-input" placeholder="Enter your name">
+                </div>
+                <button class="save-btn" onclick="saveAccountDetails()">Save Changes</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
